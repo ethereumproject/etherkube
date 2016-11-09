@@ -1,0 +1,5 @@
+*.iml
+*.iws
+*.log
+*.DS_Store
+Session.vim

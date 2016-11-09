@@ -1,0 +1,18 @@
+# Ethereum Kubernetes Sandbox
+
+The purpose of the project is to simplify the process of launching a private Ethereum cluster, with the main use case
+ which is testing Ethereum protocol modifications, private Dapp testing or for running a private blockchain.
+
+Features:
+
+ * supports Parity or Geth
+ * run different versions in same cluster
+ * fast sync or full sync mode
+ * blockchain monitoring tools
+ * cluster monitoring tools
+ * scheduled operations over the cluster (backup, restore, etc)
+ * secure access
+
+## License
+
+All configurations and running scripts are provided under Apache 2.0 license
