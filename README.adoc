@@ -13,6 +13,42 @@ Features:
  * scheduled operations over the cluster (backup, restore, etc)
  * secure access
 
+## Usage
+
+### 1. Setup Cloud provider
+
+To start you have to create a new Google Cloud project with a Cloud Containers cluster.
+
+* Google Cloud - https://console.cloud.google.com
+* Cloud Containers (GKE) - https://console.cloud.google.com/kubernetes/list?project=
+
+### 2. Configure EtherKube
+
+For Google Cloud project Id is `my_project_id` and a Cloud Container Cluster named `test-cluster-1` run following:
+
+----
+export GCLOUD_PROJECT_ID=my_project_id
+./tools/bin/etherkube cluster test-cluster-1
+----
+
+### 3. Copy binaries
+
+Copy Geth compiled binary for Linux in `./containers/geth-provided/` directory
+
+### 4. Deploy Geth to the cloud
+
+----
+./tools/bin/etherkube deploy geth-provided
+----
+
+### 5. Watch how it works
+
+----
+kubectl logs --tail=10 -f <node-geth-XXXX>
+----
+
+(it's safe to Ctrl-C at any moment, to detach from remote log)
+
 ## License
 
 All configurations and running scripts are provided under Apache 2.0 license

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: node-geth
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: node-geth
+        app: geth
+        type: ${type}
+    spec:
+      containers:
+        - name: geth
+          image: "${docker_reg}/${project_id}/geth-${type}:latest"
+          ports:
+            - name: rpc
+              containerPort: 8545
+            - name: p2p
+              hostPort: 30303
+              containerPort: 30303

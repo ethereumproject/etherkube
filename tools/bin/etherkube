@@ -1,0 +1,79 @@
+#!/bin/sh
+
+set -e
+
+COMMAND=$1
+BINS=tools/bin
+K8S=k8s
+
+VERSION=$(date +%y%m%d%H%M%S)
+
+if [ -z "$GCLOUD_PROJECT_ID" ]; then
+    echo "GCLOUD_PROJECT_ID is not set"
+    GCLOUD_PROJECT_ID=foobar
+fi
+
+function prepare {
+    FILE=$1
+    echo "Deploy kubes from $FILE"
+
+    ## TODO read from config, hardcoded for now
+    VAR_DOCKER=gcr.io
+    VAR_TYPE=provided
+
+    cat $FILE \
+        | sed s/\${docker_reg}/$VAR_DOCKER/g \
+        | sed s/\${project_id}/$GCLOUD_PROJECT_ID/g \
+        | sed s/\${type}/$VAR_TYPE/g \
+        | kubectl create -f -
+}
+
+function build {
+    NAME=$1
+    ORG=etherkube
+    echo "Build docker container for: $ORG/$NAME from ./containers/$NAME"
+
+    docker build -t $ORG/$NAME ./containers/$NAME
+}
+
+function push_docker {
+    NAME=$1
+    ORG=etherkube
+
+    docker tag $ORG/$NAME gcr.io/$GCLOUD_PROJECT_ID/$NAME:latest
+    gcloud docker -- push gcr.io/$GCLOUD_PROJECT_ID/$NAME:latest
+    docker tag $ORG/$NAME gcr.io/$GCLOUD_PROJECT_ID/$NAME:$VERSION
+    gcloud docker -- push gcr.io/$GCLOUD_PROJECT_ID/$NAME:$VERSION
+}
+
+function deploy {
+    DOCKER_TYPE=$1
+
+    build $DOCKER_TYPE
+    push_docker $DOCKER_TYPE
+    prepare $K8S/node-geth.rc.yml
+}
+
+function cluster {
+    gcloud config set container/cluster $1
+    gcloud container clusters get-credentials $1
+}
+
+case "$COMMAND" in
+    build)
+        build $2
+        ;;
+    deploy)
+        deploy $2
+        kubectl get pods -o wide
+        ;;
+    cluster)
+        cluster $2
+        ;;
+    help)
+        echo Usage
+        echo ""
+        echo "etherkube deploy <node-type>"
+        echo etherkube deploy geth-provided
+        ;;
+esac
