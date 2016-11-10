@@ -15,6 +15,12 @@ Features:
 
 ## Usage
 
+### 0. Compile tools
+
+----
+make
+----
+
 ### 1. Setup Cloud provider
 
 To start you have to create a new Google Cloud project with a Cloud Containers cluster.
@@ -27,8 +33,9 @@ To start you have to create a new Google Cloud project with a Cloud Containers c
 For Google Cloud project Id is `my_project_id` and a Cloud Container Cluster named `test-cluster-1` run following:
 
 ----
-export GCLOUD_PROJECT_ID=my_project_id
-./tools/bin/etherkube cluster test-cluster-1
+cp etherekube-config.samle.yaml etherekube-config.yaml
+vim etherekube-config.yaml
+./bin/etherkube init
 ----
 
 ### 3. Copy binaries
@@ -38,7 +45,7 @@ Copy Geth compiled binary for Linux in `./containers/geth-provided/` directory
 ### 4. Deploy Geth to the cloud
 
 ----
-./tools/bin/etherkube deploy geth-provided
+./bin/etherkube deploy geth-provided
 ----
 
 ### 5. Watch how it works

@@ -3,15 +3,20 @@
 set -e
 
 COMMAND=$1
-BINS=tools/bin
+BINS=./bin
 K8S=k8s
 
 VERSION=$(date +%y%m%d%H%M%S)
 
+GCLOUD_PROJECT_ID=$($BINS/config gcloud get-project-id)
+CLUSTER_ID=$($BINS/config gcloud get-cluster-id)
+
 if [ -z "$GCLOUD_PROJECT_ID" ]; then
     echo "GCLOUD_PROJECT_ID is not set"
-    GCLOUD_PROJECT_ID=foobar
+    exit 1
 fi
+
+echo "Run against $GCLOUD_PROJECT_ID on cluster $CLUSTER_ID"
 
 function prepare {
     FILE=$1
@@ -55,8 +60,8 @@ function deploy {
 }
 
 function cluster {
-    gcloud config set container/cluster $1
-    gcloud container clusters get-credentials $1
+    gcloud config set container/cluster $CLUSTER_ID
+    gcloud container clusters get-credentials $CLUSTER_ID
 }
 
 case "$COMMAND" in
@@ -67,8 +72,8 @@ case "$COMMAND" in
         deploy $2
         kubectl get pods -o wide
         ;;
-    cluster)
-        cluster $2
+    init)
+        cluster
         ;;
     help)
         echo Usage

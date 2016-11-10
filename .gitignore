@@ -3,3 +3,5 @@
 *.log
 *.DS_Store
 Session.vim
+etherkube-config.yaml
+bin/config

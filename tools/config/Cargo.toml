@@ -1,0 +1,8 @@
+[package]
+name = "config"
+version = "0.1.0"
+authors = ["splix <splix@ethereumclassic.org>"]
+
+[dependencies]
+yaml-rust = { git = "https://github.com/chyh1990/yaml-rust.git" }
+clap = "2"
