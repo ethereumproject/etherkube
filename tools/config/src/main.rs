@@ -39,13 +39,47 @@ fn get_node<'d>(conf: &'d Yaml, id: &'d str) -> Option<&'d Yaml> {
     return None
 }
 
+struct Var {
+    name: String,
+    value: String
+}
+
+impl Var {
+    fn from(name: &str, val: &str) -> Self {
+        Var { name: String::from(name), value: String::from(val)}
+    }
+    fn as_pattern(&self) -> String {
+        let mut s = String::from("${");
+        s.push_str(self.name.as_str());
+        s.push('}');
+        s
+    }
+}
+
+fn apply_template<'d>(conf: &'d Yaml, node: &'d Yaml, tpl: &'d str) -> String {
+    let mut vars = Vec::new();
+    vars.push(Var::from("project_id", conf["cluster"]["googleProjectId"].as_str().unwrap()));
+    vars.push(Var::from("docker_reg", "gcr.io"));
+    vars.push(Var::from("type", node["type"].as_str().unwrap()));
+
+    let mut result = String::new();
+    result.push_str(tpl);
+
+    for var in vars {
+        result = result.replace(var.as_pattern().as_str(), var.value.as_str());
+    }
+
+    result
+}
+
 fn main() {
     let opts = App::new("etherkube-config")
         .version("0.1")
         .author("Igor Artamonov <splix@ethereumclassic.org>")
         .about("Read config details from etherkube-config.yaml")
         .args_from_usage(
-            "-c, --config=[FILE] 'Sets a custom config file'")
+            "-c, --config=[FILE] 'Sets a custom config file'
+             -n, --node=[NODE] 'Use specified node'")
         .subcommand(
             SubCommand::with_name("gcloud")
                 .about("Google Cloud Configurations")
@@ -55,6 +89,10 @@ fn main() {
                 .subcommand(
                     SubCommand::with_name("get-cluster-id")
                 )
+        )
+        .subcommand(
+            SubCommand::with_name("template")
+                .about("Process template and set configured values into it")
         );
     let matches = opts.get_matches();
 
@@ -68,9 +106,20 @@ fn main() {
             let val = conf["cluster"]["clusterId"].as_str().unwrap();
             print!("{}", val);
         }
+    } else if let Some(gcloud) = matches.subcommand_matches("template") {
+        let node_id = matches.value_of("node").unwrap();
+        match get_node(&conf, node_id) {
+            Some(node) => {
+                let mut buffer = String::new();
+                let stdin = io::stdin();
+                let mut handle = stdin.lock();
+                handle.read_to_string(&mut buffer);
+
+                let result = apply_template(&conf, &node, buffer.as_str());
+                print!("{}", result)
+            },
+            None => panic!("couldn't find {}", node_id),
+        }
     }
-//    match get_node(&conf, "node-1") {
-//        Some(n1) => println!("got node {}", "node-1"),
-//        None => panic!("couldn't find {}", "node-1"),
-//    }
+
 }

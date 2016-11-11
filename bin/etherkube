@@ -19,17 +19,12 @@ fi
 echo "Run against $GCLOUD_PROJECT_ID on cluster $CLUSTER_ID"
 
 function prepare {
-    FILE=$1
-    echo "Deploy kubes from $FILE"
-
-    ## TODO read from config, hardcoded for now
-    VAR_DOCKER=gcr.io
-    VAR_TYPE=provided
+    NODE=$1
+    FILE=$(echo "$K8S/node-\${type}.rc.yml" | $BINS/config -n $NODE template)
+    echo "Deploy kubes $NODE from $FILE"
 
     cat $FILE \
-        | sed s/\${docker_reg}/$VAR_DOCKER/g \
-        | sed s/\${project_id}/$GCLOUD_PROJECT_ID/g \
-        | sed s/\${type}/$VAR_TYPE/g \
+        | $BINS/config -n $NODE template \
         | kubectl create -f -
 }
 
@@ -52,11 +47,12 @@ function push_docker {
 }
 
 function deploy {
-    DOCKER_TYPE=$1
+    NODE=$1
+    DOCKER_TYPE=$(echo "${type}" | $BINS/config -n $NODE template)
 
     build $DOCKER_TYPE
     push_docker $DOCKER_TYPE
-    prepare $K8S/node-geth.rc.yml
+    prepare $NODE
 }
 
 function cluster {
