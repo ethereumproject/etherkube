@@ -5,14 +5,17 @@ cluster:
   clusterId: test-1
 nodes:
   - id: node-1
-    type: geth-provided
+    type: geth
+    source: provided
   - id: node-2
     type: geth
+    source: repo
     build: 65f1fbc
     features:
       - fast
       - reserved-only
     options: "--cache 2048"
   - id: node-3
-    type: parity-provided
+    type: parity
+    source: provided
     chain: testnet

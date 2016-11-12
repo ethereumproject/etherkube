@@ -60,7 +60,9 @@ fn apply_template<'d>(conf: &'d Yaml, node: &'d Yaml, tpl: &'d str) -> String {
     let mut vars = Vec::new();
     vars.push(Var::from("project_id", conf["cluster"]["googleProjectId"].as_str().unwrap()));
     vars.push(Var::from("docker_reg", "gcr.io"));
-    vars.push(Var::from("type", node["type"].as_str().unwrap()));
+    vars.push(Var::from("node_type", node["type"].as_str().unwrap()));
+    vars.push(Var::from("node_source", node["source"].as_str().unwrap()));
+    vars.push(Var::from("id", node["id"].as_str().unwrap()));
 
     let mut result = String::new();
     result.push_str(tpl);

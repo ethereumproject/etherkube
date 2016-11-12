@@ -1,19 +1,18 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: node-geth
+  name: node-${id}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        name: node-geth
-        app: geth
-        type: ${type}
+        name: node-${node_type}
+        type: ${node_type}
     spec:
       containers:
         - name: geth
-          image: "${docker_reg}/${project_id}/geth-${type}:latest"
+          image: "${docker_reg}/${project_id}/${node_type}-${node_source}:latest"
           ports:
             - name: rpc
               containerPort: 8545

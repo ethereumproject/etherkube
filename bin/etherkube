@@ -20,7 +20,7 @@ echo "Run against $GCLOUD_PROJECT_ID on cluster $CLUSTER_ID"
 
 function prepare {
     NODE=$1
-    FILE=$(echo "$K8S/node-\${type}.rc.yml" | $BINS/config -n $NODE template)
+    FILE=$(echo "$K8S/node-\${node_type}.rc.yml" | $BINS/config -n $NODE template)
     echo "Deploy kubes $NODE from $FILE"
 
     cat $FILE \
@@ -48,7 +48,7 @@ function push_docker {
 
 function deploy {
     NODE=$1
-    DOCKER_TYPE=$(echo "${type}" | $BINS/config -n $NODE template)
+    DOCKER_TYPE=$(echo "${node_type}-${node_source}" | $BINS/config -n $NODE template)
 
     build $DOCKER_TYPE
     push_docker $DOCKER_TYPE
