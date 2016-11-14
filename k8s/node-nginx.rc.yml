@@ -11,7 +11,7 @@ spec:
         type: ${node_type}
     spec:
       containers:
-        - name: geth
+        - name: nginx
           image: "${docker_reg}/${project_id}/${node_type}-${node_source}:latest"
           ports:
             - name: web-http
