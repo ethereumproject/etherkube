@@ -5,6 +5,7 @@ set -e
 COMMAND=$1
 BINS=./bin
 K8S=k8s
+CONTROL=control
 
 VERSION=$(date +%y%m%d%H%M%S)
 
@@ -60,6 +61,47 @@ function cluster {
     gcloud container clusters get-credentials $CLUSTER_ID
 }
 
+function control-deploy {
+    NODE=$1
+    ORG=etherkube
+    case "$NODE" in
+        nginx)
+            docker build -t gcr.io/$GCLOUD_PROJECT_ID/nginx:latest ./containers/nginx
+            gcloud docker -- push gcr.io/$GCLOUD_PROJECT_ID/nginx:latest
+            FILE = $(echo "$K8S/$CONTROL/nginx.rc.yml")
+            cat $FILE \
+                | $BINS/config -n $NODE template \
+                | kubectl create -f -
+        ;;
+    esac
+    echo "Pod $NODE has been deployed."
+}
+
+function control-start-service {
+    NODE=$1
+    case "$NODE" in
+        nginx)
+            FILE = $(echo "$K8S/$CONTROL/nginx.srv.yml")
+            cat $FILE \
+                | $BINS/config -n $NODE template \
+                | kubectl create -f -
+        ;;
+    esac
+    echo "Service $NODE has been started."
+}
+
+function control-stop-service {
+    NODE=$1
+    kubectl delete service $NODE
+    echo "Service $NODE has been stopped."
+}
+
+function control-proxy {
+    SERVICE=$1
+    kubectl proxy
+    echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$NODE"
+}
+
 case "$COMMAND" in
     build)
         build $2
@@ -70,6 +112,29 @@ case "$COMMAND" in
         ;;
     init)
         cluster
+        ;;
+    control)
+        CONTROLCMD=$2
+        case "$CONTROLCMD" in
+            deploy)
+                control-deploy $3
+                kubectl get pods -o wide
+            ;;
+            start-service)
+                control-start-service $3
+            ;;
+            stop-service)
+                control-stop-service $3
+            ;;
+            proxy)
+                control-proxy $3
+            ;;
+            help)
+                echo Usage
+                echo ""
+                echo "./bin/etherkube control deploy nginx"
+            ;;
+        esac
         ;;
     help)
         echo Usage
