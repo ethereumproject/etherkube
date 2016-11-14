@@ -38,6 +38,11 @@ function activate-service {
         | kubectl create -f -
 }
 
+function delete-service{
+    SERVICE=$1
+    kubectl delete service $SERVICE
+}
+
 function build {
     NAME=$1
     ORG=etherkube
@@ -74,6 +79,18 @@ function start-service {
     NODE=$1
     DOCKER_TYPE=$(echo "\${node_type}-\${node_source}" | $BINS/config -n $NODE template)
     activate-service $DOCKER_TYPE
+    echo "Service $NODE is now open."
+}
+
+function stop-service {
+    NODE=$1
+    DOCKER_TYPE=$(echo "\${node_type}-\${node_source}" | $BINS/config -n $NODE template)
+    delete-service $DOCKER_TYPE
+    echo "Service $NODE is now closed."
+}
+
+function proxy {
+    SERVICE=$1
     kubectl proxy
     echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$NODE"
 }
@@ -89,8 +106,14 @@ case "$COMMAND" in
     init)
         cluster
         ;;
-    proxy)
+    start-service)
         start-service $2
+        ;;
+    stop-service)
+        stop-service $2
+        ;;
+    proxy)
+        proxy $2
         ;;
     help)
         echo Usage
