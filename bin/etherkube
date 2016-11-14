@@ -60,6 +60,18 @@ function cluster {
     gcloud container clusters get-credentials $CLUSTER_ID
 }
 
+function start-nginx {
+    SERVICE = my-nginx
+    if [ ! -z $1]
+        then
+            : SERVICE = $1
+    fi
+    kubectl run $SERVICE --image=nginx --replicas=1 --port=80
+    kubectl expose deployment $SERVICE
+    kubectl proxy
+    echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$SERVICE"
+}
+
 case "$COMMAND" in
     build)
         build $2
@@ -70,6 +82,9 @@ case "$COMMAND" in
         ;;
     init)
         cluster
+        ;;
+    proxy)
+        start-nginx $2
         ;;
     help)
         echo Usage
