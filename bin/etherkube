@@ -28,6 +28,16 @@ function prepare {
         | kubectl create -f -
 }
 
+function activate-service {
+    NODE=$1
+    FILE=$(echo "$K8S/service-\${node_type}.srv.yml" | $BINS/config -n $NODE template)
+    echo "Starting service $NODE from $FILE"
+
+    cat $FILE \
+        | $BINS/config -n $NODE template \
+        | kubectl create -f -
+}
+
 function build {
     NAME=$1
     ORG=etherkube
@@ -60,16 +70,12 @@ function cluster {
     gcloud container clusters get-credentials $CLUSTER_ID
 }
 
-function start-nginx {
-    SERVICE = my-nginx
-    if [ ! -z $1]
-        then
-            : SERVICE = $1
-    fi
-    kubectl run $SERVICE --image=nginx --replicas=1 --port=80
-    kubectl expose deployment $SERVICE
+function start-service {
+    NODE=$1
+    DOCKER_TYPE=$(echo "\${node_type}-\${node_source}" | $BINS/config -n $NODE template)
+    activate-service $DOCKER_TYPE
     kubectl proxy
-    echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$SERVICE"
+    echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$NODE"
 }
 
 case "$COMMAND" in
@@ -84,7 +90,7 @@ case "$COMMAND" in
         cluster
         ;;
     proxy)
-        start-nginx $2
+        start-service $2
         ;;
     help)
         echo Usage
