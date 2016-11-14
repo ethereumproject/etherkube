@@ -2,12 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: service-${node_type}
-  name: service-${node_type}
+    name: service-nginx
+  name: service-nginx
 spec:
   ports:
     - port: 80
       targetPort: 80
   selector:
-    name: node-${node_type}
-    type: ${node_type}
+    name: node-nginx
+    type: nginx
