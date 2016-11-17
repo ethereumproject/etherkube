@@ -13,6 +13,27 @@ Features:
  * scheduled operations over the cluster (backup, restore, etc)
  * secure access
 
+## System requirements
+
+### Docker
+
+You need Docker to build container images, download Docker for your platform: https://www.docker.com/products/overview
+
+### Kubernetes
+
+Currently EtherKube is being tested against Google Cloud Container, and you have to download latest Gcloud SDK tool
+from https://cloud.google.com/sdk/downloads
+
+Then install Kubernetes command line client:
+----
+gcloud components install kubectl
+----
+
+### Rust Compiler
+
+You need Rust compiler and Cargo tool to build Etherkube command line utility. Most simple way would be to install
+Rustup from https://www.rustup.rs/, which will install and will help you to manage all required Rust components.
+
 ## Usage
 
 ### 0. Compile tools
