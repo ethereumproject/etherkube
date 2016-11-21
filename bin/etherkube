@@ -61,7 +61,7 @@ function cluster {
     gcloud container clusters get-credentials $CLUSTER_ID
 }
 
-function control-deploy {
+function control_deploy {
     NODE=$1
     ORG=etherkube
     case "$NODE" in
@@ -77,7 +77,7 @@ function control-deploy {
     echo "Pod $NODE has been deployed."
 }
 
-function control-start-service {
+function control_start_service {
     NODE=$1
     case "$NODE" in
         nginx)
@@ -90,13 +90,13 @@ function control-start-service {
     echo "Service $NODE has been started."
 }
 
-function control-stop-service {
+function control_stop_service {
     NODE=$1
     kubectl delete service $NODE
     echo "Service $NODE has been stopped."
 }
 
-function control-proxy {
+function control_proxy {
     SERVICE=$1
     kubectl proxy
     echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$NODE"
@@ -117,17 +117,17 @@ case "$COMMAND" in
         CONTROLCMD=$2
         case "$CONTROLCMD" in
             deploy)
-                control-deploy $3
+                control_deploy $3
                 kubectl get pods -o wide
             ;;
             start-service)
-                control-start-service $3
+                control_start_service $3
             ;;
             stop-service)
-                control-stop-service $3
+                control_stop_service $3
             ;;
             proxy)
-                control-proxy $3
+                control_proxy $3
             ;;
             help)
                 echo Usage
