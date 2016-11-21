@@ -91,6 +91,9 @@ fn main() {
                 .subcommand(
                     SubCommand::with_name("get-cluster-id")
                 )
+                .subcommand(
+                    SubCommand::with_name("get-zone-id")
+                )
         )
         .subcommand(
             SubCommand::with_name("template")
@@ -106,6 +109,9 @@ fn main() {
             print!("{}", val);
         } else if let Some(_) = gcloud.subcommand_matches("get-cluster-id") {
             let val = conf["cluster"]["clusterId"].as_str().unwrap();
+            print!("{}", val);
+        } else if let Some(_) = gcloud.subcommand_matches("get-zone-id") {
+            let val = conf["cluster"]["zoneId"].as_str().unwrap();
             print!("{}", val);
         }
     } else if let Some(gcloud) = matches.subcommand_matches("template") {

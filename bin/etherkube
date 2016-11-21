@@ -11,6 +11,7 @@ VERSION=$(date +%y%m%d%H%M%S)
 
 GCLOUD_PROJECT_ID=$($BINS/config gcloud get-project-id)
 CLUSTER_ID=$($BINS/config gcloud get-cluster-id)
+ZONE_ID=$($BINS/config gcloud get-zone-id)
 
 if [ -z "$GCLOUD_PROJECT_ID" ]; then
     echo "GCLOUD_PROJECT_ID is not set"
@@ -57,6 +58,8 @@ function deploy {
 }
 
 function cluster {
+    gcloud config set project $GCLOUD_PROJECT_ID
+    gcloud config set compute/zone $ZONE_ID
     gcloud config set container/cluster $CLUSTER_ID
     gcloud container clusters get-credentials $CLUSTER_ID
 }
