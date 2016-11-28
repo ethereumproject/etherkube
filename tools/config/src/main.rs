@@ -63,6 +63,7 @@ fn apply_template<'d>(conf: &'d Yaml, node: &'d Yaml, tpl: &'d str) -> String {
     vars.push(Var::from("node_type", node["type"].as_str().unwrap()));
     vars.push(Var::from("node_source", node["source"].as_str().unwrap()));
     vars.push(Var::from("id", node["id"].as_str().unwrap()));
+    vars.push(Var::from("node_options", node["options"].as_str().unwrap_or("")));
 
     let mut result = String::new();
     result.push_str(tpl);

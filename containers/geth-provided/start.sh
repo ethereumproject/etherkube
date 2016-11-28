@@ -4,13 +4,10 @@ echo "-------------------------------------------------------"
 echo "Run Geth provided binary"
 echo "-------------------------------------------------------"
 
-OPTS="--rpc --rpcaddr 0.0.0.0 $NODE_OPTS"
-
-if [ -z "$NODE_MEM" ]; then
-    NODE_MEM="4096"
+if [ -z "$NODE_OPTIONS" ]; then
+    NODE_OPTIONS="--rpc --rpcaddr 0.0.0.0 --cache 4096"
 fi
-OPTS="$OPTS --cache $NODE_MEM"
 
 /opt/geth/geth \
     --datadir /data \
-    $OPTS
+    $NODE_OPTIONS

@@ -19,3 +19,6 @@ spec:
             - name: p2p
               hostPort: 30303
               containerPort: 30303
+          env:
+            - name: NODE_OPTIONS
+              value: "${node_options}"
