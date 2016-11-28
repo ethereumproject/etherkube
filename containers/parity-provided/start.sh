@@ -8,5 +8,5 @@ fi
     --datadir /data \
     --port 30303 \
     --jsonrpc-hosts all \
-    --no-dapps --no-ipc --no-signer \
+    --no-dapps --no-ipc \
     $NODE_OPTIONS

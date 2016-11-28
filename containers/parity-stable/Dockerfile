@@ -17,4 +17,4 @@ VOLUME /data
 
 WORKDIR /opt/parity
 
-CMD ["/start.sh"]
+CMD ["/opt/parity/start.sh"]
