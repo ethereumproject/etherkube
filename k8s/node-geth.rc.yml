@@ -10,6 +10,11 @@ spec:
         name: node-${node_type}
         type: ${node_type}
     spec:
+      volumes:
+        - name: blockchain
+          gcePersistentDisk:
+            pdName: ${id}-disk
+            fsType: ext4
       containers:
         - name: geth
           image: "${docker_reg}/${project_id}/${node_type}-${node_source}:latest"
@@ -22,3 +27,6 @@ spec:
           env:
             - name: NODE_OPTIONS
               value: "${node_options}"
+          volumeMounts:
+            - mountPath: /data
+              name: blockchain
