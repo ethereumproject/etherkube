@@ -75,7 +75,7 @@ function control_deploy {
         nginx)
             docker build -t gcr.io/$GCLOUD_PROJECT_ID/nginx:latest ./containers/nginx
             gcloud docker -- push gcr.io/$GCLOUD_PROJECT_ID/nginx:latest
-            FILE = $(echo "$K8S/$CONTROL/nginx.rc.yml")
+            FILE=$(echo "$K8S/control/nginx.rc.yml")
             cat $FILE \
                 | $BINS/config -n $NODE template \
                 | kubectl create -f -
@@ -88,7 +88,7 @@ function control_start_service {
     NODE=$1
     case "$NODE" in
         nginx)
-            FILE = $(echo "$K8S/$CONTROL/nginx.srv.yml")
+            FILE = $(echo "$K8S/control/nginx.srv.yml")
             cat $FILE \
                 | $BINS/config -n $NODE template \
                 | kubectl create -f -
