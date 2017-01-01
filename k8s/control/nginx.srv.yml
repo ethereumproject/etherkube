@@ -9,5 +9,4 @@ spec:
     - port: 80
       targetPort: 80
   selector:
-    name: node-nginx
-    type: nginx
+    name: nginx
