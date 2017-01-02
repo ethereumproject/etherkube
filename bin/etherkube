@@ -27,8 +27,12 @@ function prepare {
     echo "Create disk $DISK for $NODE"
     gcloud compute disks create $DISK --type pd-ssd --size 50GB
 
-    FILE=$(echo "$K8S/node-\${node_type}.rc.yml" | $BINS/config -n $NODE template)
+    FILE=$(echo "$K8S/node.rc.yml" | $BINS/config -n $NODE template)
     echo "Deploy kubes $NODE from $FILE"
+    cat $FILE \
+        | $BINS/config -n $NODE template \
+        | kubectl create -f -
+    FILE=$(echo "$K8S/node.svc.yml" | $BINS/config -n $NODE template)
     cat $FILE \
         | $BINS/config -n $NODE template \
         | kubectl create -f -

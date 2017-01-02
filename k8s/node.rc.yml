@@ -7,8 +7,9 @@ spec:
   template:
     metadata:
       labels:
-        name: node-${node_type}
-        type: ${node_type}
+        type: node
+        name: node-${id}
+        node-type: ${node_type}
     spec:
       volumes:
         - name: blockchain
