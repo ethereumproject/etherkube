@@ -97,7 +97,7 @@ function control_stop_service {
 
 function control_proxy {
     SERVICE=$1
-    kubectl proxy
+    kubectl proxy --www='dashboard-ui/build' --www-prefix='/dashboard/'
     echo "Open your browser and go to : http://localhost:8001/api/v1/proxy/namespaces/default/services/$NODE"
 }
 
