@@ -3,10 +3,10 @@ kind: Service
 metadata:
   labels:
     type: node-svc
-  name: node-geth-testnet-fast3-svc
+  name: node-${id}-svc
 spec:
   ports:
   - port: 8545
     name: rpc
   selector:
-    name: node-geth-testnet-fast3
+    name: node-${id}

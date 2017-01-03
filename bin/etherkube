@@ -65,6 +65,28 @@ function deploy {
     prepare $NODE
 }
 
+function restart {
+    NODE=$1
+
+    FILE=$(echo "$K8S/node.rc.yml" | $BINS/config -n $NODE template)
+    SVC_ID=$(echo "node-\${id}-svc" | $BINS/config -n $NODE template)
+    RC_ID=$(echo "node-\${id}" | $BINS/config -n $NODE template)
+
+    echo "Delete service $SVC_ID and controller $RC_ID"
+    kubectl delete svc $SVC_ID
+    kubectl delete rc $RC_ID
+
+    echo "Deploy kubes $NODE from $FILE"
+    cat $FILE \
+        | $BINS/config -n $NODE template \
+        | kubectl create -f -
+    FILE=$(echo "$K8S/node.svc.yml" | $BINS/config -n $NODE template)
+    cat $FILE \
+        | $BINS/config -n $NODE template \
+        | kubectl create -f -
+
+}
+
 function cluster {
     gcloud config set project $GCLOUD_PROJECT_ID
     gcloud config set compute/zone $ZONE_ID
@@ -112,6 +134,12 @@ case "$COMMAND" in
     deploy)
         deploy $2
         kubectl get pods -o wide
+        ;;
+    restart)
+        restart $2
+        kubectl get rc -o wide
+        kubectl get pods -o wide
+        kubectl get svc -o wide
         ;;
     init)
         cluster
