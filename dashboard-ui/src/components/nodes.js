@@ -10,6 +10,7 @@ const Render = ({nodes}) => {
             <TableRow>
                 <TableHeaderColumn>ID</TableHeaderColumn>
                 <TableHeaderColumn>Since</TableHeaderColumn>
+                <TableHeaderColumn>Height</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={false}>
@@ -18,6 +19,7 @@ const Render = ({nodes}) => {
                 <TableRow key={node.service.metadata.uid} selectable={false}>
                     <TableRowColumn>{node.service.metadata.name}</TableRowColumn>
                     <TableRowColumn>{node.service.metadata.creationTimestamp}</TableRowColumn>
+                    <TableRowColumn>{node.height}</TableRowColumn>
                 </TableRow>
             );
             })}

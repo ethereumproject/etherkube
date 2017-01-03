@@ -25,9 +25,25 @@ function setNodes(state, action) {
     }
 }
 
+function setHeight(state, action) {
+    switch (action.type) {
+        case 'NODES/SET-HEIGHT':
+            const idx = state.get('items').findIndex((n) => n.getIn(['service', 'metadata', 'name']) === action.nodeName);
+            if (idx >= 0) {
+                return state.update('items', (items) =>
+                    items.update(idx, (n) => n.set('height', action.height))
+                )
+            }
+            return state;
+        default:
+            return state
+    }
+}
+
 export const nodesReducers = function(state, action) {
     state = state || initial;
     state = setLoading(state, action);
     state = setNodes(state, action);
+    state = setHeight(state, action);
     return state;
 };
