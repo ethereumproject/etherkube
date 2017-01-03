@@ -5,7 +5,7 @@ var srcDir = path.join(__dirname, 'src');
 
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CopyWebpackPlugin = require('copy-webpack-plugin');
-var DirectoryNameAsMain = require('webpack-directory-name-as-main');
+var DirectoryNameAsMain = require('@elastic/webpack-directory-name-as-main');
 
 var watch = process.argv.indexOf('--no-watch') < 0;
 
