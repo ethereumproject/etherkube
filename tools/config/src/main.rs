@@ -10,6 +10,16 @@ use std::error::Error;
 use yaml_rust::{YamlLoader, Yaml};
 use clap::{App, SubCommand};
 
+macro_rules! stderr {
+    ($($arg:tt)*) => (
+        use std::io::Write;
+        match writeln!(&mut ::std::io::stderr(), $($arg)* ) {
+            Ok(_) => {},
+            Err(x) => panic!("Unable to write to stderr (file handle closed?): {}", x),
+        }
+    )
+}
+
 fn read_config<'d>(fname: &'d str) -> Option<Yaml> {
     let path = Path::new(fname);
     let display = path.display();
@@ -43,6 +53,7 @@ fn get_node<'d, 'e>(conf: &'d Yaml, id: &'d str) -> Option<Node> {
         }
         i += 1;
     }
+    stderr!("Unable to find node {}", id); //maybe it's better to panic here?
     return None
 }
 
@@ -63,15 +74,20 @@ impl Var {
     }
 }
 
-fn apply_template<'d>(conf: &'d Yaml, node: &'d Node, tpl: &'d str) -> String {
+fn apply_template<'d>(conf: &'d Yaml, node: &'d Option<Node>, tpl: &'d str) -> String {
     let mut vars = Vec::new();
     vars.push(Var::from("project_id", conf["cluster"]["googleProjectId"].as_str().unwrap()));
     vars.push(Var::from("docker_reg", "gcr.io"));
-    vars.push(Var::from("node_type", node.conf["type"].as_str().unwrap()));
-    vars.push(Var::from("node_source", node.conf["source"].as_str().unwrap()));
-    vars.push(Var::from("id", node.conf["id"].as_str().unwrap()));
-    vars.push(Var::from("node_options", node.conf["options"].as_str().unwrap_or("")));
-    vars.push(Var::from("node_index", &node.index.to_string()));
+    match *node {
+        Some(ref node_conf) => {
+            vars.push(Var::from("node_type", node_conf.conf["type"].as_str().unwrap()));
+            vars.push(Var::from("node_source", node_conf.conf["source"].as_str().unwrap()));
+            vars.push(Var::from("id", node_conf.conf["id"].as_str().unwrap()));
+            vars.push(Var::from("node_options", node_conf.conf["options"].as_str().unwrap_or("")));
+            vars.push(Var::from("node_index", &node_conf.index.to_string()));
+        }
+        None => {}
+    }
 
     let mut result = String::new();
     result.push_str(tpl);
@@ -124,24 +140,21 @@ fn main() {
             print!("{}", val);
         }
     } else if let Some(_) = matches.subcommand_matches("template") {
-        let node_id = matches.value_of("node").unwrap();
-        match get_node(&conf, node_id) {
-            Some(node) => {
-                let mut buffer = String::new();
-                let stdin = io::stdin();
-                let mut handle = stdin.lock();
-                match handle.read_to_string(&mut buffer) {
-                    Ok(_) => {
-                        let result = apply_template(&conf, &node, buffer.as_str());
-                        print!("{}", result)
-                    }
-                    Err(_) => {
-                        print!("Input is empty")
-                    }
-                }
+        let node = match matches.value_of("node") {
+            Some(node_id) => get_node(&conf, node_id),
+            None => None
+        };
 
-            },
-            None => panic!("couldn't find {}", node_id),
+        let mut buffer = String::new();
+        let stdin = io::stdin();
+        let mut handle = stdin.lock();
+
+        match handle.read_to_string(&mut buffer) {
+            Ok(_) => {
+                let result = apply_template(&conf, &node, buffer.as_str());
+                print!("{}", result)
+            }
+            Err(_) => print!("Input is empty")
         }
     }
 
