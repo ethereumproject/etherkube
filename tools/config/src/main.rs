@@ -8,7 +8,7 @@ use std::path::Path;
 use std::error::Error;
 
 use yaml_rust::{YamlLoader, Yaml};
-use clap::{Arg, App, SubCommand};
+use clap::{App, SubCommand};
 
 fn read_config<'d>(fname: &'d str) -> Option<Yaml> {
     let path = Path::new(fname);
@@ -29,12 +29,19 @@ fn read_config<'d>(fname: &'d str) -> Option<Yaml> {
     return Some(doc)
 }
 
-fn get_node<'d>(conf: &'d Yaml, id: &'d str) -> Option<&'d Yaml> {
+struct Node {
+    conf: Yaml,
+    index: i32
+}
+
+fn get_node<'d, 'e>(conf: &'d Yaml, id: &'d str) -> Option<Node> {
+    let mut i = 0;
     for node in conf["nodes"].as_vec().unwrap() {
         let x = node["id"].as_str().unwrap();
         if x == id {
-            return Some(node)
+            return Some(Node { conf: node.clone(), index: i})
         }
+        i += 1;
     }
     return None
 }
@@ -56,14 +63,15 @@ impl Var {
     }
 }
 
-fn apply_template<'d>(conf: &'d Yaml, node: &'d Yaml, tpl: &'d str) -> String {
+fn apply_template<'d>(conf: &'d Yaml, node: &'d Node, tpl: &'d str) -> String {
     let mut vars = Vec::new();
     vars.push(Var::from("project_id", conf["cluster"]["googleProjectId"].as_str().unwrap()));
     vars.push(Var::from("docker_reg", "gcr.io"));
-    vars.push(Var::from("node_type", node["type"].as_str().unwrap()));
-    vars.push(Var::from("node_source", node["source"].as_str().unwrap()));
-    vars.push(Var::from("id", node["id"].as_str().unwrap()));
-    vars.push(Var::from("node_options", node["options"].as_str().unwrap_or("")));
+    vars.push(Var::from("node_type", node.conf["type"].as_str().unwrap()));
+    vars.push(Var::from("node_source", node.conf["source"].as_str().unwrap()));
+    vars.push(Var::from("id", node.conf["id"].as_str().unwrap()));
+    vars.push(Var::from("node_options", node.conf["options"].as_str().unwrap_or("")));
+    vars.push(Var::from("node_index", &node.index.to_string()));
 
     let mut result = String::new();
     result.push_str(tpl);
@@ -115,17 +123,23 @@ fn main() {
             let val = conf["cluster"]["zoneId"].as_str().unwrap();
             print!("{}", val);
         }
-    } else if let Some(gcloud) = matches.subcommand_matches("template") {
+    } else if let Some(_) = matches.subcommand_matches("template") {
         let node_id = matches.value_of("node").unwrap();
         match get_node(&conf, node_id) {
             Some(node) => {
                 let mut buffer = String::new();
                 let stdin = io::stdin();
                 let mut handle = stdin.lock();
-                handle.read_to_string(&mut buffer);
+                match handle.read_to_string(&mut buffer) {
+                    Ok(_) => {
+                        let result = apply_template(&conf, &node, buffer.as_str());
+                        print!("{}", result)
+                    }
+                    Err(_) => {
+                        print!("Input is empty")
+                    }
+                }
 
-                let result = apply_template(&conf, &node, buffer.as_str());
-                print!("{}", result)
             },
             None => panic!("couldn't find {}", node_id),
         }
