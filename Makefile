@@ -1,12 +1,24 @@
-all: compile install
+all: config.compile config.install ui.prepare ui.compile
 
-dist: compile install zip
-
-compile:
-	cd tools/config && cargo build --release
-
-install:
-	cp tools/config/target/release/config bin/
+dist: config.dist ui.dist zip
 
 zip:
-	zip dist.zip -r . -x .\* tools/\* Makefile containers/.\*
+	rm dist.zip && \
+	zip dist.zip -r bin/ containers/ dashboard-ui/build/ k8s/ -x .\* containers/.\* && \
+	zip dist.zip -r . -i *.yaml LICENSE *.adoc
+
+config.dist: config.compile config.install
+
+config.compile:
+	cd tools/config && cargo build --release
+
+config.install:
+	cp tools/config/target/release/config bin/
+
+ui.dist: ui.prepare ui.compile
+
+ui.prepare:
+	cd dashboard-ui && npm install
+
+ui.compile:
+	cd dashboard-ui && node build --no-watch
