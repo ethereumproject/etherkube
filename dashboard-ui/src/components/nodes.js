@@ -5,21 +5,26 @@ import log from 'loglevel';
 
 const Render = ({nodes}) => {
 
+    const shortStyle = { width: 12 };
+    const wideStyle = { width: 120 };
+
     var table = <Table selectable={false}>
         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableRow>
-                <TableHeaderColumn>ID</TableHeaderColumn>
-                <TableHeaderColumn>Since</TableHeaderColumn>
-                <TableHeaderColumn>Height</TableHeaderColumn>
+                <TableHeaderColumn style={shortStyle}>ID</TableHeaderColumn>
+                <TableHeaderColumn style={shortStyle}>Since</TableHeaderColumn>
+                <TableHeaderColumn style={shortStyle}>Height</TableHeaderColumn>
+                <TableHeaderColumn style={wideStyle}>Hash</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={false}>
             {nodes.map( (node) => {
             return (
                 <TableRow key={node.service.metadata.uid} selectable={false}>
-                    <TableRowColumn>{node.service.metadata.name}</TableRowColumn>
-                    <TableRowColumn>{node.service.metadata.creationTimestamp}</TableRowColumn>
-                    <TableRowColumn>{node.height}</TableRowColumn>
+                    <TableRowColumn style={shortStyle}>{node.service.metadata.name}</TableRowColumn>
+                    <TableRowColumn style={shortStyle}>{node.service.metadata.creationTimestamp}</TableRowColumn>
+                    <TableRowColumn style={shortStyle}>{node.height}</TableRowColumn>
+                    <TableRowColumn style={wideStyle}>{typeof(node.block) === 'object' ? node.block.hash : ''}</TableRowColumn>
                 </TableRow>
             );
             })}

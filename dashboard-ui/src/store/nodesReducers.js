@@ -40,10 +40,30 @@ function setHeight(state, action) {
     }
 }
 
+function setBlock(state, action) {
+    switch (action.type) {
+        case 'NODES/SET-BLOCK':
+            const idx = state.get('items').findIndex((n) => n.getIn(['service', 'metadata', 'name']) === action.nodeName);
+            if (idx >= 0 && action.block) {
+                return state.update('items', (items) =>
+                    items.update(idx, (n) => {
+                        return n.set('height', typeof(action.block.number) == 'string' ?
+                                        parseInt(action.block.number, 16) : n.get('height'))
+                                .set('block', Immutable.fromJS(action.block))
+                    })
+                )
+            }
+            return state;
+        default:
+            return state
+    }
+}
+
 export const nodesReducers = function(state, action) {
     state = state || initial;
     state = setLoading(state, action);
     state = setNodes(state, action);
     state = setHeight(state, action);
+    state = setBlock(state, action);
     return state;
 };
