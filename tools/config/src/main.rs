@@ -85,6 +85,7 @@ fn apply_template<'d>(conf: &'d Yaml, node: &'d Option<Node>, tpl: &'d str) -> S
             vars.push(Var::from("id", node_conf.conf["id"].as_str().unwrap()));
             vars.push(Var::from("node_options", node_conf.conf["options"].as_str().unwrap_or("")));
             vars.push(Var::from("node_index", &node_conf.index.to_string()));
+            vars.push(Var::from("node_port", &node_conf.conf["port"].as_i64().unwrap_or(30303).to_string()));
         }
         None => {}
     }

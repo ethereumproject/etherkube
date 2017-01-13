@@ -23,7 +23,7 @@ spec:
             - name: rpc
               containerPort: 8545
             - name: p2p
-              hostPort: 30303
+              hostPort: ${node_port}
               containerPort: 30303
           env:
             - name: NODE_OPTIONS
