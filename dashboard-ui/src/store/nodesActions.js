@@ -3,7 +3,7 @@ import 'whatwg-fetch'
 
 const headers = {
     'Content-Type': 'application/json'
-}
+};
 
 function extractNode(service) {
     return {
@@ -63,5 +63,11 @@ export function getNodes() {
                 dispatch({type: "NODES/SET-ITEMS", value: nodes});
                 nodes.forEach((node) => dispatch(getNodeHeight(node)));
             })
+    }
+}
+
+export function reloadNode(node) {
+    return function (dispatch) {
+        dispatch(getNodeHeight(node));
     }
 }

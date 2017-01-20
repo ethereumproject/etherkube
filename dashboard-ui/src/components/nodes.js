@@ -16,6 +16,7 @@ const Render = ({nodes}) => {
                 <TableHeaderColumn style={shortStyle}>Height</TableHeaderColumn>
                 <TableHeaderColumn style={shortStyle}>Timestamp</TableHeaderColumn>
                 <TableHeaderColumn style={wideStyle}>Hash</TableHeaderColumn>
+                <TableHeaderColumn style={shortStyle}>Actions</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={false}>
