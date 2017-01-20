@@ -10,10 +10,10 @@ zip:
 config.dist: config.compile config.install
 
 config.compile:
-	cd tools/config && cargo build --release
+	cd config && cargo build --release
 
 config.install:
-	cp tools/config/target/release/config bin/
+	cp config/target/release/config bin/
 
 ui.dist: ui.prepare ui.compile
 
