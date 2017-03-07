@@ -126,8 +126,11 @@ fn main() {
                 .about("Process template and set configured values into it")
         );
     let matches = opts.get_matches();
-
-    let conf = read_config("etherkube-config.yaml").unwrap();
+    let conf_name = match matches.value_of("config") {
+        Some(f) => f,
+        None => "etherkube-config.yaml"
+    };
+    let conf = read_config(conf_name).unwrap();
 
     if let Some(gcloud) = matches.subcommand_matches("gcloud") {
         if let Some(_) = gcloud.subcommand_matches("get-project-id") {
