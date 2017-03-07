@@ -13,7 +13,7 @@ config.compile:
 	cd config && cargo build --release
 
 config.install:
-	cp config/target/release/config bin/
+	cp config/target/release/etherkube-config bin/config
 
 ui.dist: ui.prepare ui.compile
 
